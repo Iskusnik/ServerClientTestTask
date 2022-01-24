@@ -30,9 +30,9 @@ namespace ClientApp
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.richTextBoxClientResult = new System.Windows.Forms.RichTextBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBoxFilesRout = new System.Windows.Forms.TextBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.buttonOpenFileDialog = new System.Windows.Forms.Button();
             this.buttonSendReq = new System.Windows.Forms.Button();
@@ -60,7 +60,7 @@ namespace ClientApp
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.richTextBox1);
+            this.splitContainer1.Panel1.Controls.Add(this.richTextBoxClientResult);
             // 
             // splitContainer1.Panel2
             // 
@@ -69,15 +69,15 @@ namespace ClientApp
             this.splitContainer1.SplitterDistance = 344;
             this.splitContainer1.TabIndex = 0;
             // 
-            // richTextBox1
+            // richTextBoxClientResult
             // 
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(678, 344);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
+            this.richTextBoxClientResult.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxClientResult.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxClientResult.Name = "richTextBoxClientResult";
+            this.richTextBoxClientResult.ReadOnly = true;
+            this.richTextBoxClientResult.Size = new System.Drawing.Size(678, 344);
+            this.richTextBoxClientResult.TabIndex = 0;
+            this.richTextBoxClientResult.Text = "";
             // 
             // splitContainer2
             // 
@@ -88,7 +88,7 @@ namespace ClientApp
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.textBox1);
+            this.splitContainer2.Panel1.Controls.Add(this.textBoxFilesRout);
             // 
             // splitContainer2.Panel2
             // 
@@ -97,13 +97,14 @@ namespace ClientApp
             this.splitContainer2.SplitterDistance = 438;
             this.splitContainer2.TabIndex = 0;
             // 
-            // textBox1
+            // textBoxFilesRout
             // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(438, 23);
-            this.textBox1.TabIndex = 0;
+            this.textBoxFilesRout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxFilesRout.Location = new System.Drawing.Point(0, 0);
+            this.textBoxFilesRout.Name = "textBoxFilesRout";
+            this.textBoxFilesRout.ReadOnly = true;
+            this.textBoxFilesRout.Size = new System.Drawing.Size(438, 23);
+            this.textBoxFilesRout.TabIndex = 0;
             // 
             // splitContainer3
             // 
@@ -171,9 +172,9 @@ namespace ClientApp
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox richTextBoxClientResult;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxFilesRout;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.Button buttonOpenFileDialog;
         private System.Windows.Forms.Button buttonSendReq;

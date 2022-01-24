@@ -29,13 +29,48 @@ namespace ServerApp
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.richTextBoxResults = new System.Windows.Forms.RichTextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // richTextBoxResults
+            // 
+            this.richTextBoxResults.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxResults.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.richTextBoxResults.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxResults.Name = "richTextBoxResults";
+            this.richTextBoxResults.ReadOnly = true;
+            this.richTextBoxResults.Size = new System.Drawing.Size(800, 450);
+            this.richTextBoxResults.TabIndex = 0;
+            this.richTextBoxResults.Text = "";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(632, 0);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // FormServer
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.richTextBoxResults);
+            this.Name = "FormServer";
+            this.Text = "Ceрвep";
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.RichTextBox richTextBoxResults;
+        private System.Windows.Forms.Button button1;
     }
 }
 
