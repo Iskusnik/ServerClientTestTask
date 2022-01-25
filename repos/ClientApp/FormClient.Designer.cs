@@ -32,7 +32,7 @@ namespace ClientApp
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.richTextBoxClientResult = new System.Windows.Forms.RichTextBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.textBoxFilesRout = new System.Windows.Forms.TextBox();
+            this.textBoxFilesPath = new System.Windows.Forms.TextBox();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.buttonOpenFileDialog = new System.Windows.Forms.Button();
             this.buttonSendReq = new System.Windows.Forms.Button();
@@ -88,7 +88,7 @@ namespace ClientApp
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.textBoxFilesRout);
+            this.splitContainer2.Panel1.Controls.Add(this.textBoxFilesPath);
             // 
             // splitContainer2.Panel2
             // 
@@ -97,14 +97,14 @@ namespace ClientApp
             this.splitContainer2.SplitterDistance = 438;
             this.splitContainer2.TabIndex = 0;
             // 
-            // textBoxFilesRout
+            // textBoxFilesPath
             // 
-            this.textBoxFilesRout.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxFilesRout.Location = new System.Drawing.Point(0, 0);
-            this.textBoxFilesRout.Name = "textBoxFilesRout";
-            this.textBoxFilesRout.ReadOnly = true;
-            this.textBoxFilesRout.Size = new System.Drawing.Size(438, 23);
-            this.textBoxFilesRout.TabIndex = 0;
+            this.textBoxFilesPath.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxFilesPath.Location = new System.Drawing.Point(0, 0);
+            this.textBoxFilesPath.Name = "textBoxFilesPath";
+            this.textBoxFilesPath.ReadOnly = true;
+            this.textBoxFilesPath.Size = new System.Drawing.Size(438, 23);
+            this.textBoxFilesPath.TabIndex = 0;
             // 
             // splitContainer3
             // 
@@ -133,6 +133,7 @@ namespace ClientApp
             this.buttonOpenFileDialog.TabIndex = 4;
             this.buttonOpenFileDialog.Text = "Выбрать файл";
             this.buttonOpenFileDialog.UseVisualStyleBackColor = true;
+            this.buttonOpenFileDialog.Click += new System.EventHandler(this.buttonOpenFileDialog_Click);
             // 
             // buttonSendReq
             // 
@@ -143,6 +144,7 @@ namespace ClientApp
             this.buttonSendReq.TabIndex = 2;
             this.buttonSendReq.Text = "Отправить";
             this.buttonSendReq.UseVisualStyleBackColor = true;
+            this.buttonSendReq.Click += new System.EventHandler(this.buttonSendReq_Click);
             // 
             // FormClient
             // 
@@ -174,7 +176,7 @@ namespace ClientApp
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.RichTextBox richTextBoxClientResult;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.TextBox textBoxFilesRout;
+        private System.Windows.Forms.TextBox textBoxFilesPath;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.Button buttonOpenFileDialog;
         private System.Windows.Forms.Button buttonSendReq;

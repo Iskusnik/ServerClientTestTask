@@ -17,5 +17,22 @@ namespace ClientApp
             InitializeComponent();
         }
 
+        private void buttonSendReq_Click(object sender, EventArgs e)
+        {
+            Client client = new Client(textBoxFilesPath.Text);
+            string[] filesContent = client.GetStrings();
+            for (int i = 0; i < filesContent.Length; i++)
+            {
+                richTextBoxClientResult.Text += (i + 1).ToString() + ". " + filesContent[i] + "\n";
+                //отправка запроса и результат
+            }
+        }
+
+        private void buttonOpenFileDialog_Click(object sender, EventArgs e)
+        {
+            FolderBrowserDialog fileDialog = new FolderBrowserDialog();
+            fileDialog.ShowDialog();
+            textBoxFilesPath.Text = fileDialog.SelectedPath;
+        }
     }
 }

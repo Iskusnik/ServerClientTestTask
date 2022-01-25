@@ -20,9 +20,12 @@ namespace ServerApp
             set;
         }
 
+        private Queue<string> RequestQue;
+
         public Server(int N)
         {
             this.N = N;
+            RequestQue = new Queue<string>();
         }
 
         /// <summary>
@@ -44,6 +47,21 @@ namespace ServerApp
         private void ReturnResult(string clientAdress, bool result)
         {
 
+        }
+
+        public void StartWaiting()
+        {
+            //Запуск TcpListener
+            //Запуск обработчика
+            try
+            {
+                //Пытаемся добавить в очередь
+                //Если очередь заполнена - throw Exception "Очередь заполнена, повторите запрос позже"
+            }
+            catch(Exception n)
+            {
+                //Написать, что очередь заполнена
+            }
         }
     }
 }

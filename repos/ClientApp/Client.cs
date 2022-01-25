@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace ClientApp
 {
@@ -20,11 +21,16 @@ namespace ClientApp
         /// <summary>
         /// Путь к папке с текстовыми файлами
         /// </summary>
-        private readonly string FolderRout;
+        private readonly string FolderPath;
 
-        public Client(string FolderRout)
+        /// <summary>
+        /// Содержимое файлов в папке
+        /// </summary>
+        private string[] InnerFiles;
+
+        public Client(string FolderPath)
         {
-            this.FolderRout = FolderRout;
+            this.FolderPath = FolderPath;
             ClientCount++;
         }
 
@@ -34,9 +40,15 @@ namespace ClientApp
         /// Отправка запроса на проверку файлов из папки
         /// </summary>
         /// <param name="serverAdress">Путь/адресс к серверу</param>
-        public void ClientJob(string serverAdress)
+        public string[] GetStrings()
         {
+            string[] names = Directory.GetFiles(FolderPath, "*.txt");
+            InnerFiles = new string[names.Length];
 
+            for (int i = 0; i < names.Length; i++)
+                InnerFiles[i] = File.ReadAllText(names[i]);
+
+            return InnerFiles;
         }
 
 
@@ -44,9 +56,10 @@ namespace ClientApp
         /// Отправка запроса на проверку одного файла
         /// </summary>
         /// <param name="serverAdress">Путь/адресс к серверу</param>
-        public void SendRequest(string serverAdress)
+        /// <returns>Результат запроса: является или нет палиндромом или ошибка</returns>
+        public string SendRequest(string serverAdress)
         {
-
+            return null;
         }
 
         

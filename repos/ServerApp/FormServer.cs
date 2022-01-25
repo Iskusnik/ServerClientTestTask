@@ -20,9 +20,9 @@ namespace ServerApp
         private void button1_Click(object sender, EventArgs e)
         {
             Server server = new Server(1);
-            richTextBoxResults.Text += "123456456123" + "\n" + server.IsPalindrom("123456456123").ToString() + "\n";
-            richTextBoxResults.Text += "1a'a1" + "\n" + server.IsPalindrom("1a'a1").ToString() + "\n";
-            richTextBoxResults.Text += "123321" + "\n" + server.IsPalindrom("123321").ToString() + "\n";
+            richTextBoxResults.Text += "12" + "\n" + server.IsPalindrom("12").ToString() + "\n";
+            richTextBoxResults.Text += "1" + "\n" + server.IsPalindrom("1").ToString() + "\n";
+            richTextBoxResults.Text += "121" + "\n" + server.IsPalindrom("121").ToString() + "\n";
 
         }
     }
