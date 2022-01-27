@@ -31,6 +31,9 @@ namespace ServerApp
         {
             this.richTextBoxResults = new System.Windows.Forms.RichTextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.buttonStartServer = new System.Windows.Forms.Button();
+            this.numericUpDownN = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownN)).BeginInit();
             this.SuspendLayout();
             // 
             // richTextBoxResults
@@ -46,7 +49,7 @@ namespace ServerApp
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(632, 0);
+            this.button1.Location = new System.Drawing.Point(721, 33);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 1;
@@ -54,15 +57,50 @@ namespace ServerApp
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // buttonStartServer
+            // 
+            this.buttonStartServer.Location = new System.Drawing.Point(652, 2);
+            this.buttonStartServer.Name = "buttonStartServer";
+            this.buttonStartServer.Size = new System.Drawing.Size(148, 23);
+            this.buttonStartServer.TabIndex = 2;
+            this.buttonStartServer.Text = "Запуск обработчика";
+            this.buttonStartServer.UseVisualStyleBackColor = true;
+            this.buttonStartServer.Click += new System.EventHandler(this.buttonStartServer_Click);
+            // 
+            // numericUpDownN
+            // 
+            this.numericUpDownN.Location = new System.Drawing.Point(602, 2);
+            this.numericUpDownN.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.numericUpDownN.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownN.Name = "numericUpDownN";
+            this.numericUpDownN.Size = new System.Drawing.Size(44, 23);
+            this.numericUpDownN.TabIndex = 3;
+            this.numericUpDownN.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
             // FormServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.numericUpDownN);
+            this.Controls.Add(this.buttonStartServer);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.richTextBoxResults);
             this.Name = "FormServer";
             this.Text = "Ceрвep";
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownN)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -71,6 +109,8 @@ namespace ServerApp
 
         private System.Windows.Forms.RichTextBox richTextBoxResults;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonStartServer;
+        private System.Windows.Forms.NumericUpDown numericUpDownN;
     }
 }
 

@@ -7,11 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace ClientApp
 {
     public partial class FormClient : Form
     {
+
+        Thread ClientWaiting;
+
         public FormClient()
         {
             InitializeComponent();
@@ -24,7 +28,9 @@ namespace ClientApp
             for (int i = 0; i < filesContent.Length; i++)
             {
                 richTextBoxClientResult.Text += (i + 1).ToString() + ". " + filesContent[i] + "\n";
-                //отправка запроса и результат
+                
+                ClientWaiting = new Thread(client.SendRequests);//Task.Run(() => Server.StartWaiting());
+                ClientWaiting.Start(this);
             }
         }
 
@@ -33,6 +39,20 @@ namespace ClientApp
             FolderBrowserDialog fileDialog = new FolderBrowserDialog();
             fileDialog.ShowDialog();
             textBoxFilesPath.Text = fileDialog.SelectedPath;
+        }
+
+        /// <summary>
+        /// Меняем текст из другого потока
+        /// </summary>
+        /// <param name="value"></param>
+        public void AppendTextBox(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AppendTextBox), new object[] { value });
+                return;
+            }
+            richTextBoxClientResult.Text += value;
         }
     }
 }
