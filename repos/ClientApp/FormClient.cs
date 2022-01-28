@@ -17,6 +17,13 @@ namespace ClientApp
         Client Client;
         Thread ClientWaiting;
 
+        public enum ResultMeaning : int
+        {
+            NoResult,
+            True,
+            False,
+            InProgress
+        }
         public FormClient()
         {
             InitializeComponent();
@@ -25,14 +32,14 @@ namespace ClientApp
         private void buttonSendReq_Click(object sender, EventArgs e)
         {
             Client = new Client(textBoxFilesPath.Text);
-            string[] filesContent = Client.GetStrings();
-            for (int i = 0; i < filesContent.Length; i++)
-            {
-                richTextBoxClientResult.Text += (i + 1).ToString() + ". " + filesContent[i] + "\n";
-                
-                ClientWaiting = new Thread(SendRequests);//Task.Run(() => Server.StartWaiting());
-                ClientWaiting.Start();
-            }
+            Client.GetStrings();
+            for (int i = 0; i < Client.InnerFiles.Length; i++)
+                richTextBoxClientResult.Text += i.ToString() + ". " + Client.InnerFiles[i] + "\n";
+            
+
+            ClientWaiting = new Thread(SendRequests);//Task.Run(() => Server.StartWaiting());
+            
+            ClientWaiting.Start();
         }
 
         private void buttonOpenFileDialog_Click(object sender, EventArgs e)
@@ -46,6 +53,18 @@ namespace ClientApp
         /// Меняем текст из другого потока
         /// </summary>
         /// <param name="value"></param>
+        public void AppendTextBoxWithSplit(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AppendTextBoxWithSplit), new object[] { value });
+                return;
+            }
+            //Убираем разделители
+            string[] valueSplit = value.Split("_^_");
+            value = valueSplit[0] + ". " + valueSplit[1] + ": "+ valueSplit[2];
+            richTextBoxClientResult.Text +=  value + "\n";
+        }
         public void AppendTextBox(string value)
         {
             if (InvokeRequired)
@@ -58,54 +77,93 @@ namespace ClientApp
 
 
 
+
+
+        
         /// <summary>
         /// Отправка запроса на проверку файлов
         /// </summary>
         /// <param name="serverAdress">Путь/адресс к серверу</param>
-        public void SendRequests(object form)
+        public void SendRequests()
         {
-            FormClient formClient = (FormClient)form;
-            string serverAdress = "127.0.0.1";
+            string serverAdress = "127.0.0.3";
             TcpClient tcpClient = new TcpClient(serverAdress, 8888);
+            tcpClient.ReceiveTimeout = 5000;
+            bool threadNeeded = true;
+
+            NetworkStream stream = tcpClient.GetStream();
             try
             {
-                for (int i = 0; i < Client.InnerFiles.Length; i++)
+                while (threadNeeded)
                 {
-                    bool noRes = true;
-                    while (noRes)
-                    {
-                        NetworkStream stream = tcpClient.GetStream();
-                        // преобразуем сообщение в массив байтов
-                        byte[] data = Encoding.Unicode.GetBytes(Client.InnerFiles[i]);
-                        // отправка сообщения
-                        stream.Write(data, 0, data.Length);
+                    RepeatedSend(stream);
+                    RepeatedGet(stream);
 
-                        string result = Client.InnerFiles[i] + " " + GetAnswer(tcpClient, ref noRes);
-
-                        AppendTextBox(result);
-                    }
+                    foreach (ResultMeaning meaning in Client.FileInWork)
+                        threadNeeded = threadNeeded &&
+                            (meaning != ResultMeaning.True || meaning != ResultMeaning.False);
                 }
             }
             catch (Exception e)
             {
                 AppendTextBox(e.Message);
             }
-            finally
+        }
+        
+
+        /// <summary>
+        /// Метод для обхода отправки всех файлов
+        /// </summary>
+        /// <param name="stream"></param>
+        public void RepeatedSend(NetworkStream stream)
+        {
+            //отправляем для каждого файла запрос
+            for (int i = 0; i < Client.InnerFiles.Length; i++)
             {
-                tcpClient.Close();
+                //Если запрос не принят, то пытаемся его отправить
+                if (Client.FileInWork[i] == ResultMeaning.NoResult)
+                {
+                    // преобразуем сообщение в массив байтов
+                    // сообщение:
+                    // i - индекс в массиве имеющихся строк
+                    // _^_ - разделитель
+                    //
+                    // $$$ - конец строки
+                    byte[] data = Encoding.UTF8.GetBytes(i.ToString() + "_^_" + Client.InnerFiles[i] + "$$$");
+                    // отправка сообщения
+                    stream.Write(data, 0, data.Length);
+                }
             }
         }
 
+        /// <summary>
+        /// Метод для обхода получения сообщений
+        /// </summary>
+        /// <param name="tcpClient"></param>
+        public void RepeatedGet(NetworkStream stream)
+        {
+            // обрабатываем ответы от сервера
+            string[] results = GetAnswer(stream).Split("$$$");
+            for (int i = 0; i < results.Length - 1; i++)
+            {
+                int innerFileId = -1;
+                ResultMeaning tempRes = ResultMeaning.NoResult;
+                string res = TranslateAnswer(results[i], ref tempRes, ref innerFileId);
+                if (innerFileId != -1)
+                {
+                    Client.FileInWork[innerFileId] = tempRes;
+                    AppendTextBoxWithSplit(results[i]);
+                }
+            }
+        }
 
         /// <summary>
         /// Ожидание ответа
         /// </summary>
         /// <returns></returns>
-        public string GetAnswer(TcpClient tcpClient, ref bool haveRes)
+        public string GetAnswer(NetworkStream stream)
         {
-            NetworkStream stream = tcpClient.GetStream();
-
-            byte[] data = new byte[200];
+            byte[] data = new byte[2000];
             StringBuilder builder = new StringBuilder();
             int bytes = 0;
             try
@@ -113,21 +171,40 @@ namespace ClientApp
                 do
                 {
                     bytes = stream.Read(data, 0, data.Length);
-                    builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                }
-                while (stream.DataAvailable);
+                    builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                } while (stream.DataAvailable);
 
-                string res = builder.ToString();
-                if (res.Length > 0 && (res[0] == 'F' || res[0] == 'T'))
-                    haveRes = true;
-                else
-                    haveRes = false;
-                return res;
+
+                string builderRes = builder.ToString();
+                return builderRes;
+                
             }
             catch(Exception e)
             {
+                AppendTextBox(e.Message);
                 return e.Message;
             }
+        }
+
+        public string TranslateAnswer(string answer, ref ResultMeaning inWork, ref int innerFileId)
+        {
+            inWork = ResultMeaning.NoResult;
+
+            string[] builderResSplit = answer.Split("_^_");
+            innerFileId = int.Parse(builderResSplit[0]);
+            string res = builderResSplit[2];
+            if (res.Length > 0)
+            {
+                if (res[0] == '-')
+                    inWork = ResultMeaning.NoResult;
+                if (res[0] == '+')
+                    inWork = ResultMeaning.InProgress;
+                if (res[0] == 'T')
+                    inWork = ResultMeaning.True;
+                if (res[0] == 'F')
+                    inWork = ResultMeaning.False;
+            }
+            return res;
         }
     }
 }

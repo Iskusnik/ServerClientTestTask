@@ -13,8 +13,9 @@ namespace ClientApp
     /// Клиент, создающий запросы к серверу на основе текстовых файлов, 
     /// хранящихся в FolderRout
     /// </summary>
-    class Client
+    public class Client
     {
+
         /// <summary>
         /// Подсчёт клиентов
         /// </summary>
@@ -29,6 +30,11 @@ namespace ClientApp
         /// Содержимое файлов в папке
         /// </summary>
         public string[] InnerFiles;
+
+        /// <summary>
+        /// Находится ли файл в обработке на сервере или необходима повторная отправка
+        /// </summary>
+        public FormClient.ResultMeaning[] FileInWork;
 
         public Client(string FolderPath)
         {
@@ -46,10 +52,12 @@ namespace ClientApp
         {
             string[] names = Directory.GetFiles(FolderPath, "*.txt");
             InnerFiles = new string[names.Length];
-
+            FileInWork = new FormClient.ResultMeaning[names.Length];
             for (int i = 0; i < names.Length; i++)
+            {
                 InnerFiles[i] = File.ReadAllText(names[i]);
-
+                FileInWork[i] = FormClient.ResultMeaning.NoResult;
+            }
             return InnerFiles;
         }
 

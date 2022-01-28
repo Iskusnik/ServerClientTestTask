@@ -22,27 +22,11 @@ namespace ServerApp
             InitializeComponent();
         }
 
-        #region Удалить/временное
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ServerWaiting = new Thread(IsPaliTask);
-            ServerWaiting.Start();
-            
-        }
-
-        private void IsPaliTask()
-        {
-            Server server = new Server(1);
-            AppendTextBox("1" + "\n" + server.IsPalindrom("1").ToString() + "\n");
-            AppendTextBox("121" + "\n" + server.IsPalindrom("1").ToString() + "\n");
-            AppendTextBox("123" + "\n" + server.IsPalindrom("1").ToString() + "\n");
-        }
-        #endregion
 
         private void buttonStartServer_Click(object sender, EventArgs e)
         {
             Server = new Server((int)numericUpDownN.Value);
-            
+
             ServerWaiting = new Thread(StartWaiting);
             ServerWaiting.Start();
 
@@ -56,18 +40,31 @@ namespace ServerApp
 
 
         #region Работа в другом потоке
-        private enum ResultMeaning : int
+        public enum ResultMeaning : int
         {
             NoResult,
             True,
-            False
+            False,
+            InProgress
         }
-        const string IPadress = "127.0.0.1";
+        const string IPadress = "127.0.0.3";
 
         /// <summary>
         /// Меняем текст из другого потока
         /// </summary>
         /// <param name="value"></param>
+        public void AppendTextBoxWithSplit(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.BeginInvoke(new Action<string>(AppendTextBoxWithSplit), new object[] { value });
+                return;
+            }
+            //Убираем разделители
+            string[] valueSplit = value.Split("$$$")[0].Split("_^_");
+            value = valueSplit[0] + ". " + valueSplit[1] + ": " + valueSplit[2];
+            richTextBoxResults.Text += value + "\n";
+        }
         public void AppendTextBox(string value)
         {
             if (InvokeRequired)
@@ -83,31 +80,34 @@ namespace ServerApp
         /// </summary>
         /// <param name="client">TCP клиент которому надо отправить сообщение</param>
         /// <param name="result">Результат проверки на палиндром</param>
-        private void ReturnResult(TcpClient client, ResultMeaning result)
+        private void ReturnResult(NetworkStream stream, ResultMeaning result, string request)
         {
-
-            string msg = "";
+            string msg = request + "_^_";
             try
             {
-                NetworkStream stream = client.GetStream();
-
                 switch (result)
                 {
                     case ResultMeaning.NoResult:
-                        msg = "Ошибка. Очередь заполнена";
+                        msg += "-Ошибка. Очередь заполнена.";
                         break;
                     case ResultMeaning.True:
-                        msg = "True. Палиндром";
+                        msg += "True. Палиндром";
                         break;
                     case ResultMeaning.False:
-                        msg = "False. Не палиндром";
+                        msg += "False. Не палиндром";
+                        break;
+                    case ResultMeaning.InProgress:
+                        msg += "+Запрос принят";
                         break;
                 }
+                msg += "$$$";
+
                 //Выводим результат на сервере
-                AppendTextBox(client.ToString() + msg);
+                AppendTextBoxWithSplit("Отправлено: " + msg + "\n");
                 //Преобразуем сообщение в массив байтов
-                byte[] data = Encoding.Unicode.GetBytes(msg);
+                byte[] data = Encoding.UTF8.GetBytes(msg);
                 //Отправляем сообщение
+                
                 stream.Write(data, 0, data.Length);
             }
             catch (System.ObjectDisposedException)
@@ -125,36 +125,75 @@ namespace ServerApp
             TcpListener listener = new TcpListener(addressIP, 8888);
             listener.Start();
             AppendTextBox("Сервер ожидает запросы");
-            try
+            List<Thread> clientThreads = new List<Thread>();
+
+            while (true)
             {
-                while (true)
+                try
                 {
                     TcpClient client = listener.AcceptTcpClient();
-                    NetworkStream stream = client.GetStream();
-
-                    if (Server.RequestQue.Count > Server.N)
-                        throw new Exception("Очередь заполнена. Повторите отправку");
-                    else
-                    {
-                        byte[] data = new byte[200];
-                        int bytes = stream.Read(data, 0, data.Length);
-                        string isPali = Encoding.UTF8.GetString(data, 0, bytes);
-                        Server.RequestQue.Enqueue(isPali);
-                        Server.ClientQue.Enqueue(client);
-                    }
-
-                    stream.Close();
-                    client.Close();
+                    Thread newClient = new Thread(ClientWork);
+                    clientThreads.Add(newClient);
+                    newClient.Start(client);
+                }
+                catch (Exception n)
+                {
+                    AppendTextBox(n.Message);
                 }
             }
-            catch (Exception n)
+        }
+
+        /// <summary>
+        /// Работа с отдельным клиентом
+        /// </summary>
+        public void ClientWork(object clientData)
+        {
+            TcpClient client = (TcpClient)clientData;
+            NetworkStream stream = client.GetStream();
+            while (true)
             {
-                AppendTextBox(n.Message);
-            }
-            finally
-            {
-                if (listener != null)
-                    listener.Stop();
+                try
+                {
+                    
+                    byte[] data = new byte[200];
+                    StringBuilder builder = new StringBuilder();
+                    int bytes = 0;
+
+                    do
+                    {
+                        bytes = stream.Read(data, 0, data.Length);
+                        builder.Append(Encoding.UTF8.GetString(data, 0, bytes));
+                    }
+                    while (stream.DataAvailable);
+
+
+
+                    string encodedStr = builder.ToString();
+                    AppendTextBox(encodedStr);
+                    string[] isPalis = encodedStr.Split("$$$");
+
+                    for (int i = 0; i < isPalis.Length - 1; i++)
+                    {
+                        if (Server.RequestQue.Count >= Server.N)
+                        {
+                            ReturnResult(stream, ResultMeaning.NoResult, isPalis[i]);
+                            AppendTextBox("Очередь заполнена. Повторите отправку");
+                            //Добавляем ожидание освобождения рабочей очереди
+                            Thread.Sleep(500);
+                        }
+                        else
+                        {
+                            Server.RequestQue.Enqueue(isPalis[i]);
+                            Server.ClientQue.Enqueue(client);
+                            Server.StreamQue.Enqueue(stream);
+                            ReturnResult(stream, ResultMeaning.InProgress, isPalis[i]);
+                        }
+                    }
+                }
+                catch (Exception n)
+                {
+                    AppendTextBox(n.Message);
+                }
             }
         }
 
@@ -169,14 +208,18 @@ namespace ServerApp
                 {
                     string request = Server.RequestQue.Dequeue();
                     TcpClient client = Server.ClientQue.Dequeue();
+                    NetworkStream stream = Server.StreamQue.Dequeue();
+
                     ResultMeaning result;
 
-                    if (Server.IsPalindrom(request))
+                    string[] requestSplit = request.Split("_^_");
+
+                    if (Server.IsPalindrom(requestSplit[1]))
                         result = ResultMeaning.True;
                     else
                         result = ResultMeaning.False;
 
-                    ReturnResult(client, result);
+                    ReturnResult(stream, result, request);
                 }
             }
         }
