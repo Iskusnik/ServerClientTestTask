@@ -15,7 +15,11 @@ namespace ServerApp
 {
     public partial class FormServer : Form
     {
+       
         Server Server;
+        //Треды для обработки запросов
+        //ServerWaiting - принимает клиентов и записывает их запросы в очередь
+        //PaliJobWaiting - смотрит в очередь запросов и обрабатывает их
         Thread ServerWaiting, PaliJobWaiting;
         public FormServer()
         {

@@ -30,7 +30,6 @@ namespace ServerApp
         private void InitializeComponent()
         {
             this.richTextBoxResults = new System.Windows.Forms.RichTextBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.buttonStartServer = new System.Windows.Forms.Button();
             this.numericUpDownN = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownN)).BeginInit();
@@ -86,7 +85,6 @@ namespace ServerApp
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.numericUpDownN);
             this.Controls.Add(this.buttonStartServer);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.richTextBoxResults);
             this.Name = "FormServer";
             this.Text = "Ceрвep";
@@ -98,7 +96,6 @@ namespace ServerApp
         #endregion
 
         private System.Windows.Forms.RichTextBox richTextBoxResults;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button buttonStartServer;
         private System.Windows.Forms.NumericUpDown numericUpDownN;
     }

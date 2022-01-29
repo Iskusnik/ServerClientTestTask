@@ -34,7 +34,7 @@ namespace ClientApp
         /// <summary>
         /// Находится ли файл в обработке на сервере или необходима повторная отправка
         /// </summary>
-        public FormClient.ResultMeaning[] FileInWork;
+        public FormClient.ResultMeaning[] FileStatus;
 
         public Client(string FolderPath)
         {
@@ -52,11 +52,11 @@ namespace ClientApp
         {
             string[] names = Directory.GetFiles(FolderPath, "*.txt");
             InnerFiles = new string[names.Length];
-            FileInWork = new FormClient.ResultMeaning[names.Length];
+            FileStatus = new FormClient.ResultMeaning[names.Length];
             for (int i = 0; i < names.Length; i++)
             {
                 InnerFiles[i] = File.ReadAllText(names[i]);
-                FileInWork[i] = FormClient.ResultMeaning.NoResult;
+                FileStatus[i] = FormClient.ResultMeaning.NoResult;
             }
             return InnerFiles;
         }

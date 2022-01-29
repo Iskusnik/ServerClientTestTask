@@ -15,6 +15,7 @@ namespace ClientApp
     public partial class FormClient : Form
     {
         Client Client;
+        //Тред для отправки запросов на сервер
         Thread ClientWaiting;
 
         public enum ResultMeaning : int
@@ -74,11 +75,6 @@ namespace ClientApp
             }
             richTextBoxClientResult.Text += value + "\n";
         }
-
-
-
-
-
         
         /// <summary>
         /// Отправка запроса на проверку файлов
@@ -86,12 +82,14 @@ namespace ClientApp
         /// <param name="serverAdress">Путь/адресс к серверу</param>
         public void SendRequests()
         {
+            //Настройки клиента
             string serverAdress = "127.0.0.3";
             TcpClient tcpClient = new TcpClient(serverAdress, 8888);
+            //Время ожидания ответа сервера
             tcpClient.ReceiveTimeout = 5000;
-            bool threadNeeded = true;
 
             NetworkStream stream = tcpClient.GetStream();
+            bool threadNeeded = true;
             try
             {
                 while (threadNeeded)
@@ -99,7 +97,8 @@ namespace ClientApp
                     RepeatedSend(stream);
                     RepeatedGet(stream);
 
-                    foreach (ResultMeaning meaning in Client.FileInWork)
+                    //Проверка готовности запросов
+                    foreach (ResultMeaning meaning in Client.FileStatus)
                         threadNeeded = threadNeeded &&
                             (meaning != ResultMeaning.True || meaning != ResultMeaning.False);
                 }
@@ -108,8 +107,9 @@ namespace ClientApp
             {
                 AppendTextBox(e.Message);
             }
-        }
-        
+            tcpClient.Close();
+            stream.Close();
+        } 
 
         /// <summary>
         /// Метод для обхода отправки всех файлов
@@ -121,7 +121,7 @@ namespace ClientApp
             for (int i = 0; i < Client.InnerFiles.Length; i++)
             {
                 //Если запрос не принят, то пытаемся его отправить
-                if (Client.FileInWork[i] == ResultMeaning.NoResult)
+                if (Client.FileStatus[i] == ResultMeaning.NoResult)
                 {
                     // преобразуем сообщение в массив байтов
                     // сообщение:
@@ -151,7 +151,7 @@ namespace ClientApp
                 string res = TranslateAnswer(results[i], ref tempRes, ref innerFileId);
                 if (innerFileId != -1)
                 {
-                    Client.FileInWork[innerFileId] = tempRes;
+                    Client.FileStatus[innerFileId] = tempRes;
                     AppendTextBoxWithSplit(results[i]);
                 }
             }
